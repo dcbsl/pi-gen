@@ -40,10 +40,18 @@ on_chroot <<EOF
 for GRP in input spi i2c gpio; do
 	groupadd -f -r "\$GRP"
 done
+EOF
+
+if [ "${FIRST_USER_USE_HARDWARE_GROUPS}" = "1" ]; then
+        echo "Adding hardware groups etc for first user"
+        on_chroot << EOF
 for GRP in adm dialout cdrom audio users sudo video games plugdev input gpio spi i2c netdev; do
   adduser $FIRST_USER_NAME \$GRP
 done
 EOF
+else
+        echo "skipping hardware groups etc for first user"
+fi
 
 on_chroot << EOF
 setupcon --force --save-only -v
